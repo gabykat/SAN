@@ -1,0 +1,166 @@
+ <body>
+        <ui:composition template="./portadaEstudiante.xhtml">
+            <ui:define name="title">Responder Test </ui:define>
+            <ui:define name="content">
+                <h:form id="test">
+                    <p:focus />  
+                    <p:messages id="msm"/>
+                    <p:panel>
+                        <div align="center">
+                            <span style="font-size: large">
+                                <h1><h:outputText value="#{cuestionarioSession.cuestionario.nombre}"/>
+                                    <img src="resources/imagenes/firma.png" width="60" height="70"/></h1>
+                            </span>
+                        </div>
+                    </p:panel>
+                    <p:panel header="Asignatura">
+                        <p:selectOneMenu id="asignaturaId" value="#{testController.asignatura}" required="true" requiredMessage="Seleccione la Asignatura.">
+                            <f:selectItem itemLabel="Seleccione una opción" itemValue="" />
+                            <f:selectItems value="#{testController.listarAsignaturas()}"/>
+                        </p:selectOneMenu>
+                    </p:panel>
+                    <p:panel>
+                        <c:forEach id="formSeccion" var="seccion" items="#{seccionCuestionarioController.secciones}">
+                            <p:panel header="#{seccion.nombre}" toggleable="true" styleClass="ui-panel1">
+                                <!--SUBSECCIONES-->
+                                <c:forEach var="subseccion" items="#{seccionCuestionarioController.subSecciones(seccion, seccionCuestionarioController.seccionesAux)}">
+                                    <p:panel header="#{subseccion.nombre}" toggleable="true" styleClass="ui-panel2">
+                                        <c:forEach id="items" var="preguntaSub" items="#{subseccion.preguntaList}">
+                                            <p:panel header="#{preguntaSub.orden}. #{preguntaSub.texto}" styleClass="ui-panel3">
+                                                <!--PREGUNTA TIENE ITEMS-->
+                                                <c:if test="#{preguntaSub.itemPreguntaList.size()>0}">
+                                                    <!--PREGUNTA SEA DISTINTO DE RADIO-->
+                                                    <c:if test="#{preguntaSub.tipoPreguntaId.id!=2}">
+                                                        <c:forEach var="itemSub" items="#{preguntaSub.itemPreguntaList}">
+                                                            <h:panelGrid columns="2" rowClasses="rowpanelgrid" styleClass="panelgrid" columnClasses="col-sm-3,col-sm-9">
+                                                                <h:outputLabel value="#{itemSub.texto}"/>
+                                                                <c:if test="#{preguntaSub.tipoPreguntaId.id==1}">
+                                                                    <p:selectBooleanCheckbox id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+
+                                                                </c:if>
+                                                                <c:if test="#{preguntaSub.tipoPreguntaId.id==4}">
+                                                                    <p:inputText id="itempregunta_#{itemSub.id}pregunta-#{preguntaSub.id}x" requiredMessage="No ha contestado la pregunta"/>
+                                                                </c:if>
+                                                                <c:if test="#{preguntaSub.tipoPreguntaId.id==9}">
+                                                                    <p:fileUpload id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+                                                                </c:if>
+                                                                <c:if test="#{preguntaSub.tipoPreguntaId.id==10}">
+                                                                    <p:outputLabel id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+                                                                </c:if>
+                                                            </h:panelGrid>
+                                                        </c:forEach>  
+                                                    </c:if>
+                                                    <!--PREGUNTA SEA DISTINTO DE RADIO-->
+                                                    <c:if test="#{preguntaSub.tipoPreguntaId.id==2}">
+                                                        <p:selectOneRadio  id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x">
+                                                            <f:selectItems var="#{itemSub}" itemValue="#{item}" itemLabel="#{item}" value="#{preguntaSub.itemPreguntaList}"/>
+                                                        </p:selectOneRadio>
+                                                        <p:inputTextarea id="itempregunta_#{item.id}pregunta-#{pregunta.id}x">
+                                                            <p:ajax update="msm" />
+                                                        </p:inputTextarea>
+                                                    </c:if>
+                                                </c:if>
+                                                <!--FIN PREGUNTA TIENE ITEMS-->
+                                                <!--PREGUNTA NO TIENE ITEMS-->
+                                                <c:if test="#{preguntaSub.itemPreguntaList.size()==0}">
+                                                    <c:if test="#{preguntaSub.tipoPreguntaId.id==4}">
+                                                        <p:inputText  id="pregunta-#{preguntaSub.id}x" requiredMessage="No ha contestado la pregunta"/>
+                                                    </c:if>
+                                                    <c:if test="#{preguntaSub.tipoPreguntaId.id==3}">
+                                                        <p:inputTextarea id="pregunta-#{preguntaSub.id}x" requiredMessage="No ha contestado la pregunta"/>
+                                                    </c:if>
+                                                    <c:if test="#{preguntaSub.tipoPreguntaId.id==10}">
+                                                        <p:outputLabel id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+                                                    </c:if>
+                                                </c:if>
+
+                                            </p:panel>
+                                        </c:forEach>  
+                                    </p:panel>
+                                </c:forEach>  
+                                <!--FIN SUBSECCIONES-->
+                                <!--PREGUNTAS-->
+                                <c:forEach  var="pregunta" items="#{seccion.preguntaList}">
+                                    <p:panel header="#{pregunta.orden}. #{pregunta.texto}" styleClass="ui-panel3">
+                                        <!--PREGUNTA TIENE ITEMS-->
+                                        <c:if test="#{pregunta.itemPreguntaList.size()>0}">
+                                            <!--PREGUNTA SEA DISTINTO DE RADIO-->
+                                            <c:if test="#{pregunta.tipoPreguntaId.id!=2}">
+                                                <c:forEach var="item" items="#{pregunta.itemPreguntaList}">
+                                                    <h:panelGrid columns="2" rowClasses="rowpanelgrid" styleClass="panelgrid" columnClasses="col-sm-3,col-sm-9">
+                                                        <h:outputLabel value="#{item.texto}"/>
+                                                        <c:if test="#{pregunta.tipoPreguntaId.id==1}">
+                                                            <p:selectBooleanCheckbox id="item_#{item.id}pregunta-#{pregunta.id}x"/>
+                                                        </c:if>
+                                                        <c:if test="#{pregunta.tipoPreguntaId.id==4}">
+                                                            <p:inputText  id="itempregunta_#{item.id}pregunta-#{pregunta.id}x" requiredMessage="No ha contestado la pregunta"/>
+                                                        </c:if>
+                                                        <c:if test="#{preguntaSub.tipoPreguntaId.id==9}">
+                                                            <p:fileUpload id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+                                                        </c:if>
+                                                        <c:if test="#{preguntaSub.tipoPreguntaId.id==10}">
+                                                            <p:outputLabel id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+                                                        </c:if>
+                                                    </h:panelGrid>
+                                                </c:forEach>  
+                                            </c:if>
+                                            <!--PREGUNTA SEA DISTINTO DE RADIO-->
+                                            <c:if test="#{pregunta.tipoPreguntaId.id==2}">
+                                                <p:selectOneRadio id="pregunta-#{pregunta.id}x">
+                                                    <f:selectItems var="#{item}" itemValue="#{item}" itemLabel="#{item}" value="#{pregunta.itemPreguntaList}"/>
+                                                </p:selectOneRadio>
+                                                <p:inputTextarea placeholder="En caso de marcar SI, por favor especifíque su respuesta aquí."  id="observacion-#{pregunta.id}x"  >
+
+                                                </p:inputTextarea>
+                                            </c:if>
+                                        </c:if>
+                                        <!--FIN PREGUNTA TIENE ITEMS-->
+                                        <!--PREGUNTA NO TIENE ITEMS-->
+                                        <c:if test="#{pregunta.itemPreguntaList.size()==0}">
+                                            <c:if test="#{pregunta.tipoPreguntaId.id==4}">
+                                                <p:inputText  id="pregunta-#{pregunta.id}x" requiredMessage="No ha contestado la pregunta"/>
+                                            </c:if>
+                                            <c:if test="#{pregunta.tipoPreguntaId.id==3}">
+                                                <p:inputTextarea id="pregunta-#{pregunta.id}x" requiredMessage="No ha contestado la pregunta"/>
+                                            </c:if>
+                                            <c:if test="#{pregunta.tipoPreguntaId.id==1}">
+                                                <p:selectBooleanCheckbox id="pregunta-#{pregunta.id}x"/>
+                                            </c:if>
+                                            <c:if test="#{pregunta.tipoPreguntaId.id==7}">
+                                                <p:calendar id="pregunta-#{pregunta.id}x"></p:calendar>
+                                            </c:if>
+                                            <c:if test="#{preguntaSub.tipoPreguntaId.id==9}">
+                                                <p:fileUpload id="pregunta-#{preguntaSub.id}x"/>
+                                            </c:if>
+                                            <c:if test="#{preguntaSub.tipoPreguntaId.id==10}">
+                                                <p:outputLabel id="item_#{itemSub.id}pregunta-#{preguntaSub.id}x"/>
+                                            </c:if>
+                                        </c:if>
+
+                                    </p:panel>
+                                </c:forEach>
+                            </p:panel>
+                        </c:forEach>
+                    </p:panel>
+                    <br/>
+                    <h:panelGrid styleClass="pnl-botones" columns="2">
+                        <p:commandButton icon="ui-icon-disk" value="grabar" update="@form" action= "#{testController.capturarRespuestas(testSession.test, sessionEstudianteUsuario.estudianteUsuario.usuario)}" onstart="dlgLoading.show();" oncomplete="dlgLoading.hide();"  >
+                            <f:param name="1" value="estudiante"/>
+                            <f:param name="2" value=""/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                </h:form>
+                <p:dialog widgetVar="dlgAceptarEst" modal="true" appendToBody="false" closeOnEscape="true" resizable="false" width="500" header="OPCIONES DE GRABADO">
+                    <h:form>
+                        <p:panel>
+                            <h:panelGrid styleClass="panelgrid" rowClasses="row" columnClasses="col-sm-3,col-sm-3,col-sm-3,col-sm-3" columns="4">
+                                <p:commandLink action="#{testController.grabar(testSession.test,testController.contestaciones,sessionEstudianteUsuario.estudianteUsuario.usuario,'estudiante', 'grabar')}" onclick="PF('dlgAceptarEst').hide()" title="Solo grabar" onstart="loading.show();" oncomplete="loading.hide();"> 
+                                    <h:graphicImage styleClass="img-thumbnail" width="90" height="90" value="resources/imagenes/save_256.png"/> Presiona Grabar
+                                </p:commandLink>
+                            </h:panelGrid>
+                        </p:panel>
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+        </ui:composition>
+    </body>
